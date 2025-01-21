@@ -1,14 +1,21 @@
-# PHP JavaScript Developer Test
+# Backend Developer Test
 
-A simple test for PHP / JavaScript Developers
+A simple test for Backend developers
 
 ## Instructions
 
-1. Fork or clone this repo
-2. Write a script to Import the CSV file located in `data/customers.csv` into a database (MySQL or Mongo is preferred)
-3. Create a basic PHP web service that serves the data from the database as JSON
-4. Create a basic web page that asynchronously loads the JSON into a list or table when you click a button
-5. Email tech-tests@catchdesign.co.nz with:
+1. Clone this repo.
+2. Use one or more of these programming/scripting languages:
+   1. TypeScript
+   2. JavaScript
+   4. PHP
+   5. Python
+   6. Ruby
+   7. Bash
+4. Write a script to Import the CSV file located in `data/customers.csv` into a database.
+5. Create a basic API that presents the data from the database in a way that is suitable for a mobile or web based client.
+6. Create a basic web app that asynchronously loads the JSON data into a list view of some description.
+7. Email tech-tests@catchdesign.co.nz with:
     1. A link to your repo OR
     2. A zip file of your project including git config/metadata
 
@@ -16,13 +23,21 @@ A simple test for PHP / JavaScript Developers
 
 1. Your repo needs to include at minimum anything required to get the app working.  Detailed instructions should be provided in the `README.md` file to setup and run the app.
 2. If a structured schema migration tool is not used then a setup script must be supplied to create any data tables etc
-3. Try not spend more than 2 hours on it
+3. Aim to spend 1-4 hours on it
 
-### Bonus Points
+### Assessment Guidelines
 
-* Make it Pretty
-* Make it as OO as possible
-* Consume dependencies with tools like Composer, Bower and NPM
-* Use patterns like MVC, ORM
-* Compile any front end assets with a build tool like gulp
-* Unit tests
+* Comprehension
+* Setup/running the code should be smooth and simple
+* Selection of frameworks
+* Code should be:
+    * clean
+    * well documented / annotated / typed
+    * simple
+    * easy to maintain
+* Good package management and git practices
+* Documentation and architecture
+* Security / Performance / SEO / Accessibility considerations
+* Tests
+* General code quality, organisation and best practices
+
