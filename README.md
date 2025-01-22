@@ -14,7 +14,7 @@ A simple test for Backend developers
    7. Bash
 4. Write a script to Import the CSV file located in `data/customers.csv` into a database.
 5. Create a basic API that presents the data from the database in a way that is suitable for a mobile or web based client.
-   1. Make sure the API can page data
+   1. Implement pagination
    2. Handle user input approapriately
 7. Create a basic web app that asynchronously loads the JSON data into a list view of some description.
 8. Email tech-tests@catchdesign.co.nz with:
