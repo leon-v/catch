@@ -12,27 +12,63 @@ class Csv extends AbstractController
 {
     public function __construct(public Connection $db) {}
 
-    #[Route('/api/csv/{csvUploadId}', name: 'csv-api')]
+    #[Route('/api/csv', name: 'csv-api-index')]
+    public function fetchIndex(Request $request): JsonResponse
+    {
+        $statement = $this->db->prepare(<<<SQL
+            SELECT *
+            FROM CsvUpload
+            ORDER BY CsvUploadId
+        SQL);
+
+        $result = $statement->executeQuery();
+
+        $csvUploads = [];
+        while ($row = $result->fetchAssociative()) {
+            $row = (object) $row;
+            $csvUploads[] = (object) $row;
+        }
+
+        return new JsonResponse($csvUploads);
+    }
+
+    #[Route('/api/csv/{csvUploadId}', name: 'csv-api-entity')]
     public function fetchData(Request $request): JsonResponse
     {
         $csvUploadId = (int) $request->attributes->get('csvUploadId');
+        $page = (int) $request->query->get('page', 1);
+        $perPage = (int) $request->query->get('perPage', 20);
 
-        if (!is_numeric($csvUploadId)) {
-            throw new \Exception('Invalid CSV upload ID');
+        if (!$csvUploadId) {
+            $exception = new Csv\Exception\InvalidInput('Invalid CSV upload ID passed');
+            $exception->setStatusCode(404);
+            throw $exception;
         }
 
-        $page = $request->query->get('page', 1);
-        $perPage = $request->query->get('perPage', 20);
+        if (!$page) {
+            throw new Csv\Exception\InvalidInput('Invalid `page` query parameter passed');
+        }
+
+        if (!$perPage) {
+            throw new Csv\Exception\InvalidInput('Invalid `perPage` query parameter passed');
+        }
 
         $page = $this->getCsvData($csvUploadId, $page, $perPage);
 
         return new JsonResponse($page);
     }
 
-    public function getCsvData(int $csvUploadId, int $page, int $perPage = 20)
+    public function getCsvData(int $csvUploadId, int $page, int $perPage)
     {
 
         $csvUpload = $this->getCsvUpload($csvUploadId);
+
+        if (!$csvUpload) {
+            $exception = new Csv\Exception\InvalidInput('CSV upload ID passed not found');
+            $exception->setStatusCode(404);
+            throw $exception;
+        }
+
 
         $csvUpload->columns = $this->getCsvUploadColumns($csvUpload->csvUploadId);
 
@@ -51,7 +87,7 @@ class Csv extends AbstractController
 
         $rows = $this->getCsvUploadCells($csvUpload->csvUploadId, $fromRow, $toRow);
 
-        foreach ($rows as $row){
+        foreach ($rows as $row) {
             $csvUpload->rows[$row->rowIndex][$row->columnIndex] = $row->value;
         }
 
@@ -60,7 +96,7 @@ class Csv extends AbstractController
         return $csvUpload;
     }
 
-    public function getCsvUpload(int $csvUploadId)
+    public function getCsvUpload(int $csvUploadId): ?object
     {
 
         static $statement = null;
@@ -75,7 +111,13 @@ class Csv extends AbstractController
 
         $result = $statement->executeQuery();
 
-        return (object) $result->fetchAssociative();
+        $row = $result->fetchAssociative();
+
+        if ($row === false) {
+            return null;
+        }
+
+        return (object) $row;
     }
 
     public function getCsvUploadColumns(int $csvUploadId)
@@ -131,7 +173,7 @@ class Csv extends AbstractController
 
         $result = $statement->executeQuery();
 
-        while ($row = $result->fetchAssociative()){
+        while ($row = $result->fetchAssociative()) {
             yield (object) $row;
         }
     }
