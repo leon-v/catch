@@ -1,0 +1,39 @@
+.container-xl {
+    padding: 0;
+}
+
+.form-wrapper .form-row {
+    margin-bottom: 0.25rem;
+}
+
+.form-group {
+    margin-bottom: 0.25rem;
+}
+
+.form-group label {
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.form-control {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th,
+.table td {
+    padding: 0.25rem;
+    font-size: 0.875rem;
+    max-width: 300px; /* Adjust the width as needed */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pagination {
+    margin-top: 0.5rem;
+}
