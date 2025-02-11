@@ -11,9 +11,15 @@ class CsvView extends AbstractController
 {
     public function __construct(public Connection $db) {}
 
-    #[Route('/csv-view', name: 'csv-view')]
+    #[Route('/csv-view/{csvUploadId?}', name: 'csv-view')]
     public function handleRequest(Request $request): Response
     {
-        return $this->render('csv-view.html.twig');
+        $csvUploadId = $request->get('csvUploadId');
+
+        $csvUploadId ??= 1;
+
+        return $this->render('csv-view.html.twig', [
+            'csvUploadId' => $csvUploadId,
+        ]);
     }
 }

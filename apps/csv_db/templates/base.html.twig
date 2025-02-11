@@ -3,10 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Catch{% endblock %}</title>
-    <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}">
-    <script src="{{ asset('assets/bootstrap/js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('assets/jquery/jquery-3.5.1.slim.min.js') }}"></script>
-    <script src="{{ asset('assets/npm/popper.min.js') }}"></script>
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}">
+    {% endblock %}
+    {% block javascripts %}
+        <script src="{{ asset('assets/jquery/jquery-3.5.1.slim.min.js') }}"></script>
+        <script src="{{ asset('assets/bootstrap/js/bootstrap.min.js') }}"></script>
+        <script src="{{ asset('assets/npm/popper.min.js') }}"></script>
+        <script>
+            // Gets the 'naked' page URI. Similar to the canonical.
+            window.currentPagePath = "{{ path(app.request.attributes.get('_route')) }}"
+        </script>
+    {% endblock %}
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">

@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class Csv extends AbstractController
 {
@@ -26,6 +27,11 @@ class Csv extends AbstractController
         $csvUploads = [];
         while ($row = $result->fetchAssociative()) {
             $row = (object) $row;
+            $row->uri = $this->generateUrl(
+                'csv-api-entity',
+                ['csvUploadId' => $row->csvUploadId],
+                UrlGeneratorInterface::ABSOLUTE_PATH
+            );
             $csvUploads[] = (object) $row;
         }
 
@@ -64,13 +70,15 @@ class Csv extends AbstractController
         $csvUpload = $this->getCsvUpload($csvUploadId);
 
         if (!$csvUpload) {
-            $exception = new Csv\Exception\InvalidInput('CSV upload ID passed not found');
+            $exception = new Csv\Exception\InvalidInput("CSV upload ID '{$csvUploadId}' not found");
             $exception->setStatusCode(404);
             throw $exception;
         }
 
 
         $csvUpload->columns = $this->getCsvUploadColumns($csvUpload->csvUploadId);
+
+        // Filter data here if the table starts to collect sensitive data
 
         $csvUpload->rowCount = $this->getRowCount($csvUpload->csvUploadId);
 
@@ -152,7 +160,7 @@ class Csv extends AbstractController
 
         $result = $statement->executeQuery();
 
-        return $result->fetchOne();
+        return $result->fetchOne() ?? 0;
     }
 
     public function getCsvUploadCells(int $csvUploadId, int $fromRow, int $toRow)
