@@ -65,6 +65,8 @@ class CsvUpload extends AbstractController
             throw new CsvUpload\Exception\UploadFailure('File does not exist.');
         }
 
+        $this->db->beginTransaction();
+
         $csvUploadId = $this->commitCsvUpload($file->originalName);
 
         if (!$csvUploadId) {
@@ -78,17 +80,29 @@ class CsvUpload extends AbstractController
             throw new CsvUpload\Exception\UploadFailure('Failed to open file.');
         }
 
-        $header = fgetcsv($handle);
+        $hasHeaderRow = (bool) $request->request->get('headerRow');
 
-        dump($header);
+        if ($hasHeaderRow) {
 
-        if (!$header) {
-            throw new CsvUpload\Exception\UploadFailure('Failed to read header.');
+            $header = fgetcsv($handle);
+
+            if (!$header) {
+                throw new CsvUpload\Exception\UploadFailure('Failed to read header.');
+            }
+
+            $this->commitCsvUploadColumns($csvUploadId, $header);
         }
 
-         $this->commitCsvUploadColumns($csvUploadId, $header);
+        $rowIndex = 0;
+        while (($row = fgetcsv($handle)) !== false) {
+            $this->commitCsvUploadRow($csvUploadId, $rowIndex++, $row);
+        }
 
-        dd('end');
+        fclose($handle);
+
+        $this->db->commit();
+
+        return $this->redirectToRoute('csv-view', ['csvUploadId' => $csvUploadId]);
     }
 
     public function commitCsvUpload(string $originalName): int
@@ -114,22 +128,41 @@ class CsvUpload extends AbstractController
         static $statement = null;
 
         $statement ??= $this->db->prepare(<<<SQL
-            INSERT INTO CsvUploadColumns
-            (csvUploadId, name, `index`)
+            INSERT INTO CsvUploadColumn
+            (csvUploadId, columnIndex, name)
             VALUES
-            (:csvUploadId, :name, :index)
+            (:csvUploadId, :columnIndex, :name)
         SQL);
 
         $statement->bindValue('csvUploadId', $csvUploadId);
 
-        foreach ($columns as $index => $name) {
+        foreach ($columns as $columnIndex => $name) {
 
+            $statement->bindValue('columnIndex', $columnIndex);
             $statement->bindValue('name', $name);
-            $statement->bindValue('index', $index);
 
             $statement->executeStatement();
+        }
+    }
 
-            $this->db->lastInsertId();
+    public function commitCsvUploadRow(int $csvUploadId, int $rowIndex, array $row)
+    {
+        static $statement = null;
+
+        $statement ??= $this->db->prepare(<<<SQL
+            INSERT INTO CsvUploadCell
+            (csvUploadId, rowIndex, columnIndex, value)
+            VALUES
+            (:csvUploadId, :rowIndex, :columnIndex, :value)
+        SQL);
+
+        $statement->bindValue('csvUploadId', $csvUploadId);
+        $statement->bindValue('rowIndex', $rowIndex);
+
+        foreach ($row as $columnIndex => $value) {
+            $statement->bindValue('columnIndex', $columnIndex);
+            $statement->bindValue('value', $value);
+            $statement->executeStatement();
         }
     }
 }
