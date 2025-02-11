@@ -19,6 +19,15 @@ RUN docker-php-ext-enable apcu
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
+# Copy entrypoint script
+COPY docker/php/entrypoint.sh /usr/local/bin/
+
+# Make sure entrypoint script is executable
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Set the entrypoint
+ENTRYPOINT ["entrypoint.sh"]
+
 WORKDIR /usr/src/app
 
 ARG APP_FOLDER
@@ -34,8 +43,5 @@ COPY . /usr/src/app
 
 RUN chown -R 1000:1000 /usr/src/app
 USER 1000:1000
-
-RUN composer install && composer clear-cache
-RUN composer dump-autoload --optimize --classmap-authoritative --no-dev
 
 RUN PATH=$PATH:/usr/src/apps/vendor/bin:bin
