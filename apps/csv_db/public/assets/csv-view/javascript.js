@@ -1,5 +1,6 @@
 $(document).ready(function () {
 
+    // This will be popped and pushed into history, so must contain all state values.
     let state = {
         csvUploadId: $('#csvUploadId').val(),
         currentPage: $('#currentPage').val(),
@@ -8,6 +9,7 @@ $(document).ready(function () {
         apiUri: window.apiUri
     };
 
+    // Fetch data from the server based on the current state
     async function fetchData(state) {
         const query = {}
         if (state.currentPage){
@@ -21,7 +23,6 @@ $(document).ready(function () {
         const data = await response.json();
 
         if (!response.ok) {
-
             $('#errorBox').text(data.error || `HTTP error! status: ${response.status}`).show();
             $('#data-table').hide();
             return null;
@@ -33,8 +34,8 @@ $(document).ready(function () {
         return data;
     }
 
+    // Render the table with the fetched data
     function renderTable(data) {
-
         $('#fileName').val(data.fileName);
         $('#created').val(data.created);
         $('#currentPage').val(data.page);
@@ -62,6 +63,7 @@ $(document).ready(function () {
         renderPagination(data.page, data.pageCount);
     }
 
+    // Render pagination buttons
     function renderPagination(currentPage, pageCount) {
         const pagination = $('.pagination');
         pagination.empty();
@@ -92,8 +94,15 @@ $(document).ready(function () {
         pagination.append(createButton('>>', pageCount, currentPage === pageCount));
     }
 
-    async function loadPage(state) {
+    // Handle back/forward navigation
+    window.onpopstate = function (event) {
+        if (event.state) {
+            loadPage(event.state);
+        }
+    };
 
+    // Load a page using the passed state
+    async function loadPage(state) {
         // Update the URL with the current state
         const queryParams = new URLSearchParams({ page: state.currentPage, perPage: state.perPage });
         const newUrl = `${state.basePath}/${state.csvUploadId}?${queryParams.toString()}`;
@@ -123,11 +132,4 @@ $(document).ready(function () {
         state.currentPage = $(this).val();
         loadPage(state);
     });
-
-    // Handle back/forward navigation
-    window.onpopstate = function (event) {
-        if (event.state) {
-            loadPage(event.state);
-        }
-    };
 });
