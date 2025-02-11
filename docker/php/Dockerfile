@@ -35,15 +35,7 @@ COPY . /usr/src/app
 RUN chown -R 1000:1000 /usr/src/app
 USER 1000:1000
 
-##################################
-
-FROM php-fpm AS php
-
 RUN composer install && composer clear-cache
 RUN composer dump-autoload --optimize --classmap-authoritative --no-dev
 
 RUN PATH=$PATH:/usr/src/apps/vendor/bin:bin
-
-##################################
-
-FROM php-fpm AS composer-install
