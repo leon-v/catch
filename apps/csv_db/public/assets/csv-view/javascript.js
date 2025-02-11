@@ -68,6 +68,7 @@ $(document).ready(function () {
         const pagination = $('.pagination');
         pagination.empty();
 
+        // Create a button for pagination
         const createButton = (text, page, disabled = false) => {
             const button = $(`<button class="btn btn-primary mx-1">${text}</button>`);
             if (disabled) {
@@ -79,9 +80,11 @@ $(document).ready(function () {
             return button;
         };
 
+        // Add first and previous buttons
         pagination.append(createButton('<<', 1, currentPage === 1));
         pagination.append(createButton('<', currentPage - 1, currentPage === 1));
 
+        // Add page number buttons
         for (let i = Math.max(1, currentPage - 2); i <= Math.min(pageCount, currentPage + 2); i++) {
             const button = createButton(i, i, i === currentPage);
             if (i === currentPage) {
@@ -90,6 +93,7 @@ $(document).ready(function () {
             pagination.append(button);
         }
 
+        // Add next and last buttons
         pagination.append(createButton('>', currentPage + 1, currentPage === pageCount));
         pagination.append(createButton('>>', pageCount, currentPage === pageCount));
     }
