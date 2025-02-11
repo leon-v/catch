@@ -1,13 +1,19 @@
 FROM php:8.3.16-fpm AS php-fpm
 
+# Ensure the commands run as root
+USER root
+
 RUN apt-get update \
     && apt-get install -y \
+            sudo \
             zlib1g-dev \
             libzip-dev \
     && docker-php-ext-install -j"$(nproc)" pdo_mysql
 
 RUN docker-php-ext-install zip
 
+# Uninstall and then reinstall apcu to avoid issues wit --build
+RUN pecl uninstall apcu || true
 RUN pecl install apcu-5.1.22
 RUN docker-php-ext-enable apcu
 
@@ -17,7 +23,7 @@ WORKDIR /usr/src/app
 
 ARG APP_FOLDER
 
-RUN mkdir /.composer && chown 1000 /.composer
+RUN mkdir /.composer || true && chown 1000 /.composer
 
 COPY apps/csv_db /usr/src/app
 
