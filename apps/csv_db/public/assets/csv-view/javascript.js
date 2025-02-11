@@ -8,8 +8,6 @@ $(document).ready(function () {
         apiUri: window.apiUri
     };
 
-    console.debug(state);
-
     async function fetchData(state) {
         const query = {}
         if (state.currentPage){
@@ -96,7 +94,6 @@ $(document).ready(function () {
 
     async function loadPage(state) {
         const data = await fetchData(state);
-        console.debug(data);
         renderTable(data);
 
         // Update the URL with the current state
@@ -128,7 +125,6 @@ $(document).ready(function () {
 
     // Handle back/forward navigation
     window.onpopstate = function (event) {
-        console.debug(event.state);
         if (event.state) {
             loadPage(event.state);
         }
