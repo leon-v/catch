@@ -1,6 +1,11 @@
 # Backend Developer Test
 
-A simple test for Backend developers
+## Installation
+
+1. Clone this repo.
+```
+git clone ...
+```
 
 ## Instructions
 

@@ -93,13 +93,14 @@ $(document).ready(function () {
     }
 
     async function loadPage(state) {
-        const data = await fetchData(state);
-        renderTable(data);
 
         // Update the URL with the current state
         const queryParams = new URLSearchParams({ page: state.currentPage, perPage: state.perPage });
         const newUrl = `${state.basePath}/${state.csvUploadId}?${queryParams.toString()}`;
         history.pushState(state, '', newUrl);
+
+        const data = await fetchData(state);
+        renderTable(data);
     }
 
     // Initial load
